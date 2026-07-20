@@ -1,0 +1,44 @@
+# Full P0 on a Linux host with kernel WireGuard (use on VPS, not macOS Docker Desktop).
+# Usage: docker compose -f docker-compose.yml -f docker-compose.vpn.yml up -d
+services:
+  wireguard:
+    image: linuxserver/wireguard:latest
+    cap_add:
+      - NET_ADMIN
+      - SYS_MODULE
+    environment:
+      - PUID=0
+      - PGID=0
+      - TZ=UTC
+      - SERVERURL=${PUBLIC_IP:-auto}
+      - SERVERPORT=51820
+      - PEERS=1
+      - INTERNAL_SUBNET=10.64.0.0
+      - ALLOWEDIPS=0.0.0.0/0
+    volumes:
+      - wg_data:/config
+      - /lib/modules:/lib/modules
+    ports:
+      - "51820:51820/udp"
+    sysctls:
+      - net.ipv4.conf.all.src_valid_mark=1
+      - net.ipv4.ip_forward=1
+    restart: unless-stopped
+
+  agent:
+    build:
+      context: ../..
+      dockerfile: deploy/compose/Dockerfile.agent
+    network_mode: host
+    environment:
+      CONTROL_PLANE_URL: http://127.0.0.1:8787
+      AGENT_TOKEN: ${AGENT_TOKEN:-}
+      WG_INTERFACE: wg0
+      RECONCILE_INTERVAL_MS: "5000"
+    depends_on:
+      - api
+    restart: unless-stopped
+    privileged: true
+
+volumes:
+  wg_data:
