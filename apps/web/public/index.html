@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>PrivateRoute — VPN</title>
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <header class="top">
+    <div class="brand">PrivateRoute</div>
+    <nav id="nav-auth" class="nav"></nav>
+  </header>
+
+  <main>
+    <section id="view-landing" class="hero">
+      <p class="eyebrow">WireGuard · Your exit · Your keys</p>
+      <h1>A commercial VPN spine you control.</h1>
+      <p class="lead">
+        Sign up, get a device config, import into the official WireGuard app.
+        P0 auto-activates access (Stripe later).
+      </p>
+      <div class="actions">
+        <button class="btn primary" data-go="register">Create account</button>
+        <button class="btn ghost" data-go="login">Log in</button>
+      </div>
+      <div id="meta" class="meta muted"></div>
+    </section>
+
+    <section id="view-auth" class="card hidden">
+      <h2 id="auth-title">Account</h2>
+      <form id="auth-form" class="form">
+        <label>Email <input name="email" type="email" required autocomplete="username" /></label>
+        <label>Password <input name="password" type="password" required minlength="8" autocomplete="current-password" /></label>
+        <button class="btn primary" type="submit">Continue</button>
+      </form>
+      <p id="auth-error" class="error"></p>
+      <p class="muted"><a href="#" data-go="landing">← Back</a></p>
+    </section>
+
+    <section id="view-dash" class="hidden">
+      <div class="dash-head">
+        <div>
+          <h2>Devices</h2>
+          <p id="sub-line" class="muted"></p>
+        </div>
+        <button class="btn primary" id="btn-add">Add device</button>
+      </div>
+      <div id="nodes" class="nodes"></div>
+      <div id="devices" class="list"></div>
+      <div id="config-panel" class="card hidden">
+        <h3>WireGuard config</h3>
+        <p class="muted">Scan with the WireGuard mobile app or download the file.</p>
+        <img id="qr" alt="WireGuard QR" />
+        <pre id="conf"></pre>
+        <div class="actions">
+          <button class="btn primary" id="btn-download">Download .conf</button>
+          <button class="btn ghost" id="btn-close-conf">Close</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="foot">
+    <span>PrivateRoute P0 · Educational commercial VPN clone spine</span>
+    <a href="./privacy.html">Privacy</a>
+  </footer>
+  <script src="./app.js"></script>
+</body>
+</html>

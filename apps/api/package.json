@@ -1,0 +1,29 @@
+{
+  "name": "@privateroute/api",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc -p tsconfig.json",
+    "start": "node dist/index.js",
+    "migrate": "tsx src/migrate.ts"
+  },
+  "dependencies": {
+    "@hono/node-server": "^1.14.1",
+    "bcryptjs": "^3.0.2",
+    "hono": "^4.7.7",
+    "jose": "^6.0.10",
+    "pg": "^8.14.1",
+    "qrcode": "^1.5.4",
+    "zod": "^3.24.2"
+  },
+  "devDependencies": {
+    "@types/bcryptjs": "^2.4.6",
+    "@types/node": "^22.14.0",
+    "@types/pg": "^8.11.11",
+    "@types/qrcode": "^1.5.5",
+    "tsx": "^4.19.3",
+    "typescript": "^5.8.3"
+  }
+}

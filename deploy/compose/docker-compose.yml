@@ -1,0 +1,39 @@
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: privateroute
+      POSTGRES_PASSWORD: privateroute
+      POSTGRES_DB: privateroute
+    volumes:
+      - pr_pg:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U privateroute"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+  api:
+    build:
+      context: ../..
+      dockerfile: deploy/compose/Dockerfile.api
+    environment:
+      DATABASE_URL: postgres://privateroute:privateroute@db:5432/privateroute
+      JWT_SECRET: ${JWT_SECRET:-change-me-in-production-use-long-random}
+      BOOTSTRAP_TOKEN: ${BOOTSTRAP_TOKEN:-bootstrap-dev-token}
+      AUTO_ACTIVATE_SUBSCRIPTION: "1"
+      PORT: "8787"
+      PUBLIC_URL: ${PUBLIC_URL:-http://localhost:8787}
+      WG_DNS: "1.1.1.1"
+      COOKIE_SECURE: ${COOKIE_SECURE:-0}
+      WEB_ROOT: /app/web
+    ports:
+      - "8787:8787"
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+
+volumes:
+  pr_pg:
