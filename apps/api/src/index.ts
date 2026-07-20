@@ -51,6 +51,37 @@ app.get("/api/meta", async (c) => {
   });
 });
 
+/** Operator status for zero-touch dashboards */
+app.get("/api/status", async (c) => {
+  const nodes = await query(
+    `SELECT id, name, region, public_ip, status, last_seen_at,
+            (SELECT count(*)::int FROM devices d WHERE d.node_id = nodes.id AND d.revoked_at IS NULL) AS peers
+     FROM nodes ORDER BY created_at`,
+  );
+  const users = await query<{ count: string }>(`SELECT count(*)::text AS count FROM users`);
+  const devices = await query<{ count: string }>(
+    `SELECT count(*)::text AS count FROM devices WHERE revoked_at IS NULL`,
+  );
+  const realNodes = nodes.rows.filter(
+    (n) => n.public_ip && n.public_ip !== "127.0.0.1" && n.region !== "pending",
+  );
+  return c.json({
+    ok: true,
+    service: "privateroute-api",
+    publicUrl: PUBLIC_URL,
+    autoActivate: AUTO_ACTIVATE,
+    users: Number(users.rows[0]?.count || 0),
+    activeDevices: Number(devices.rows[0]?.count || 0),
+    nodes: nodes.rows,
+    vpnExitReady: realNodes.length > 0,
+    readyForClients: realNodes.length > 0,
+    message:
+      realNodes.length > 0
+        ? "VPN exit node registered — configs can route traffic."
+        : "Control plane OK. Waiting for a real VPN node (VPS deploy / SSH poller).",
+  });
+});
+
 // ---- Auth ----
 const credsSchema = z.object({
   email: z.string().email(),

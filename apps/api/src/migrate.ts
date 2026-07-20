@@ -58,6 +58,27 @@ CREATE INDEX IF NOT EXISTS idx_devices_node ON devices(node_id);
 
 async function main() {
   await pool.query(sql);
+
+  // Seed demo user for zero-touch smoke tests (password: password123)
+  const bcrypt = await import("bcryptjs");
+  const demoEmail = process.env.DEMO_EMAIL || "demo@privateroute.local";
+  const demoPass = process.env.DEMO_PASSWORD || "password123";
+  const existing = await pool.query(`SELECT id FROM users WHERE email = $1`, [demoEmail]);
+  if (!existing.rowCount) {
+    const hash = await bcrypt.hash(demoPass, 12);
+    const u = await pool.query<{ id: string }>(
+      `INSERT INTO users (email, password_hash) VALUES ($1, $2) RETURNING id`,
+      [demoEmail, hash],
+    );
+    await pool.query(
+      `INSERT INTO subscriptions (user_id, plan, status, device_limit)
+       VALUES ($1, 'solo', 'active', 5)
+       ON CONFLICT (user_id) DO NOTHING`,
+      [u.rows[0].id],
+    );
+    console.log(`Seeded demo user ${demoEmail}`);
+  }
+
   console.log("Migrations applied");
   await pool.end();
 }

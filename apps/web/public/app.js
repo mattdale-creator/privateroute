@@ -194,10 +194,17 @@ function escapeHtml(s) {
 async function init() {
   renderNav();
   try {
-    const meta = await api("/api/meta");
-    $("#meta").textContent = `${meta.name} · nodes: ${meta.nodes} · auto-activate: ${meta.autoActivate}`;
+    const st = await api("/api/status");
+    $("#meta").textContent = st.message
+      ? `${st.message} · users ${st.users} · devices ${st.activeDevices}`
+      : `nodes ready: ${st.vpnExitReady}`;
   } catch {
-    $("#meta").textContent = "API offline — start the control plane.";
+    try {
+      const meta = await api("/api/meta");
+      $("#meta").textContent = `${meta.name} · nodes: ${meta.nodes} · auto-activate: ${meta.autoActivate}`;
+    } catch {
+      $("#meta").textContent = "API offline — start the control plane.";
+    }
   }
   if (state.token) await loadDash();
   else show("landing");
