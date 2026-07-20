@@ -1,0 +1,13 @@
+node_modules/
+**/dist/
+.env
+.env.*
+*.log
+.DS_Store
+.astro/
+apps/api/node_modules/
+apps/web/node_modules/
+apps/node-agent/node_modules/
+apps/node-agent/dist/
+package-lock.json
+!deploy/**/package-lock.json
